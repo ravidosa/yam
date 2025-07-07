@@ -237,14 +237,6 @@ class Root extends React.Component {
                                     <option value={publisher} selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == publisher : false}>{publisher}</option>
                                 )
                             })}
-                            <option value="DENPA" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "DENPA" : false}>DENPA</option>
-                            <option value="Kodansha" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Kodansha" : false}>Kodansha</option>
-                            <option value="Medibang" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Medibang" : false}>Medibang</option>
-                            <option value="Seven Seas" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Seven Seas" : false}>Seven Seas</option>
-                            <option value="TOKYOPOP" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "TOKYOPOP" : false}>TOKYOPOP</option>
-                            <option value="Udon Entertainment" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Udon Entertainment" : false}>Udon Entertainment</option>
-                            <option value="VIZ Media" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "VIZ Media" : false}>VIZ Media</option>
-                            <option value="Yen Press" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Yen Press" : false}>Yen Press</option>
                         </select>
 
                         <hr></hr>
