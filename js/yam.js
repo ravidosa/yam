@@ -103,15 +103,62 @@ class Root extends React.Component {
                     doc = this.parseHTML(html);
                     let release = doc.querySelector('.o_release-date').innerHTML;
                     release = release.slice(release.indexOf("</strong>") + 9).trim();
-                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: release});
+                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                }
+            }
+            if (manga.publisher == "Yen Press") {
+                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com%2Fseries%2F${slugify(manga.title.en)}`);
+                let json = await response.json();
+                let html = json.contents;
+                let doc = this.parseHTML(html);
+                const volumes = doc.querySelectorAll('#volumes-list div a[href]');
+                if (volumes.length > manga.read.volumes) {
+                    const vol = volumes[volumes.length - manga.read.volumes - 1];
+                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com${vol.pathname}`);
+                    json = await response.text();
+                    json = JSON.parse(json);
+                    html = json.contents;
+                    doc = this.parseHTML(html);
+                    let release = doc.querySelectorAll('.info')[4].innerHTML;
+                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                }
+            }
+            if (manga.publisher == "Kodansha") {
+                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fseries%2FV2%2F${slugify(manga.title.en)}`);
+                let json = await response.json();
+                json = JSON.parse(json.contents);
+                let id = json.response.id;
+                response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fproduct%2FforSeries%2F${id}?platform=web?api-version=1.4`);
+                json = await response.json();
+                json = JSON.parse(json.contents);
+                if (json.length > manga.read.volumes) {
+                    let release = json[manga.read.volumes].publishDate;
+                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                }
+            }
+            if (manga.publisher == "Seven Seas") {
+                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fsevenseasentertainment.com%2Fseries%2F${slugify(manga.title.en)}`);
+                let json = await response.json();
+                let html = json.contents;
+                let doc = this.parseHTML(html);
+                const volumes = doc.querySelectorAll('.volumes-container .series-volume');
+                if (volumes.length > manga.read.volumes) {
+                    const vol = volumes[manga.read.volumes];
+                    let release = vol.text;
+                    release = release.slice(release.indexOf("Release Date:") + 12, release.indexOf("Price:")).trim();
+                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
                 }
             }
         }
-        this.setState({upcoming: upcoming})
+        console.log(upcoming);
+        this.setState({upcoming: upcoming.sort((a, b) => a.release - b.release)})
     }
     parseHTML(htmlString) {
         const parser = new DOMParser();
         return parser.parseFromString(htmlString, 'text/html');
+    }
+    sortAlphabetical(array) {
+        return array.sort((a, b) => {return a.title.en.localeCompare(b.title.en)})
     }
     render() {
         return(
@@ -129,7 +176,7 @@ class Root extends React.Component {
                         <ul>
                             {this.state.upcoming.map((manga, index) => {
                                 return (
-                                    <li>{manga.title} {manga.volume} - {manga.release}</li>
+                                    <li>{manga.title} {manga.volume} - {manga.release.toLocaleDateString()}</li>
                                 )
                             })}
                         </ul>
@@ -140,7 +187,7 @@ class Root extends React.Component {
                             return(
                                 <details>
                                     <summary>{category}</summary>
-                                    {this.state.series.filter((manga) => manga.tags.includes(category)).map((manga, index) => {
+                                    {this.sortAlphabetical(this.state.series.filter((manga) => manga.tags.includes(category))).map((manga, index) => {
                                         return (
                                             <div className="series" onClick={() => {this.setState({selected: this.state.series.indexOf(manga)})}}><h6>{manga.title.en}</h6></div>
                                         )
@@ -151,7 +198,7 @@ class Root extends React.Component {
                     }
                     <details>
                         <summary>other</summary>
-                        {this.state.series.filter((manga) => this.state.categories.every((category) => !manga.tags.includes(category))).map((manga, index) => {
+                        {this.sortAlphabetical(this.state.series.filter((manga) => this.state.categories.every((category) => !manga.tags.includes(category)))).map((manga, index) => {
                             return (
                                 <div className="series" onClick={() => {this.setState({selected: this.state.series.indexOf(manga)})}}><h6>{manga.title.en}</h6></div>
                             )
@@ -186,6 +233,9 @@ class Root extends React.Component {
                         <select id="select-publisher" name="publisher">
                             <option value="">select</option>
                             <option value="VIZ Media" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "VIZ Media" : false}>VIZ Media</option>
+                            <option value="Yen Press" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Yen Press" : false}>Yen Press</option>
+                            <option value="Kodansha" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Kodansha" : false}>Kodansha</option>
+                            <option value="Seven Seas" selected={this.state.selected != -1 ? this.state.series[this.state.selected].publisher == "Seven Seas" : false}>Seven Seas</option>
                         </select>
 
                         <hr></hr>
