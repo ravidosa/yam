@@ -1,0 +1,70 @@
+body {
+  --color-primary: #ffc2d1;
+  --color-secondary: #1d7484;
+  --color-accent-1: #bebebe;
+  --color-accent-2: #ebebeb;
+  --color-text-primary: #000000; /*black/white or other dark/light for these*/
+  --color-text-secondary: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+body {
+  --color-primary: #c9184a;
+  --color-secondary: #ffffff;
+  --color-accent-1: #FFC0CB;
+  --color-accent-2: #ebebeb;
+  --color-text-primary: #000000; /*black/white or other dark/light for these*/
+  --color-text-secondary: #ffffff;
+}
+}
+
+.series {
+    background-color: var(--color-primary);
+    margin: 10px 0px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+#list {
+    box-sizing: border-box;
+    float: left;
+    width: 50%;
+    height: 100%;
+    padding-right: 10px;
+    border-right: 2px solid var(--color-secondary);
+}
+
+#list div div h6, #list div h6 {
+    margin: 5px;
+}
+
+#select {
+    float: right;
+    width: 50%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+input {
+    border: 0px;
+}
+
+#download {
+    box-sizing: border-box;
+    width: 25%;
+    float: right;
+    text-align: center;
+}
+
+#upload {
+    box-sizing: border-box;
+    width: 70%;
+    float: left;
+    padding: 0px 5px 0px 0px;
+    text-align: center;
+}
+
+hr {
+    display:inline-block;
+    width: 100%;
+}
