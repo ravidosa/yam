@@ -91,16 +91,14 @@ class Root extends React.Component {
         for (const manga of reading) {
             if (manga.publisher == "VIZ Media") {
                 let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com%2Fmanga-books%2Fmanga%2F${slugify(manga.title.en)}%2Fall`);
-                let json = await response.json();
-                let html = json.contents;
+                let html = await response.text();
                 let doc = this.parseHTML(html);
                 const volumes = doc.querySelectorAll('.shelf article div a[href]');
                 if (volumes.length > manga.read.volumes) {
                     const vol = volumes[manga.read.volumes];
                     let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com${vol.pathname}`);
-                    json = await response.json();
-                    html = json.contents;
-                    doc = this.parseHTML(html);
+                    let html = await response.text();
+                    let doc = this.parseHTML(html);
                     let release = doc.querySelector('.o_release-date').innerHTML;
                     release = release.slice(release.indexOf("</strong>") + 9).trim();
                     upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
@@ -108,16 +106,13 @@ class Root extends React.Component {
             }
             if (manga.publisher == "Yen Press") {
                 let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fyenpress.com%2Fseries%2F${slugify(manga.title.en)}`);
-                let json = await response.json();
-                let html = json.contents;
+                let html = await response.text();
                 let doc = this.parseHTML(html);
                 const volumes = doc.querySelectorAll('#volumes-list div a[href]');
                 if (volumes.length > manga.read.volumes) {
                     const vol = volumes[volumes.length - manga.read.volumes - 1];
                     let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fyenpress.com${vol.pathname}`);
-                    json = await response.text();
-                    json = JSON.parse(json);
-                    html = json.contents;
+                    let html = await response.text();
                     doc = this.parseHTML(html);
                     let release = doc.querySelectorAll('.info')[4].innerHTML;
                     upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
@@ -138,8 +133,7 @@ class Root extends React.Component {
             }
             if (manga.publisher == "Seven Seas") {
                 let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fsevenseasentertainment.com%2Fseries%2F${slugify(manga.title.en)}`);
-                let json = await response.json();
-                let html = json.contents;
+                let html = await response.text();
                 let doc = this.parseHTML(html);
                 const volumes = doc.querySelectorAll('.volumes-container .series-volume');
                 if (volumes.length > manga.read.volumes) {
