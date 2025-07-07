@@ -121,11 +121,9 @@ class Root extends React.Component {
             if (manga.publisher == "Kodansha") {
                 let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fapi.kodansha.us%2Fseries%2FV2%2F${slugify(manga.title.en)}`);
                 let json = await response.json();
-                json = JSON.parse(json.contents);
                 let id = json.response.id;
                 response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fapi.kodansha.us%2Fproduct%2FforSeries%2F${id}?platform=web?api-version=1.4`);
                 json = await response.json();
-                json = JSON.parse(json.contents);
                 if (json.length > manga.read.volumes) {
                     let release = json[manga.read.volumes].publishDate;
                     upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
