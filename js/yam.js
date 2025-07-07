@@ -90,14 +90,14 @@ class Root extends React.Component {
         const reading = this.state.series.filter((manga) => manga.tags.includes("reading"))
         for (const manga of reading) {
             if (manga.publisher == "VIZ Media") {
-                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com%2Fmanga-books%2Fmanga%2F${slugify(manga.title.en)}%2Fall`);
+                let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com%2Fmanga-books%2Fmanga%2F${slugify(manga.title.en)}%2Fall`);
                 let json = await response.json();
                 let html = json.contents;
                 let doc = this.parseHTML(html);
                 const volumes = doc.querySelectorAll('.shelf article div a[href]');
                 if (volumes.length > manga.read.volumes) {
                     const vol = volumes[manga.read.volumes];
-                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${vol.pathname}`);
+                    let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com${vol.pathname}`);
                     json = await response.json();
                     html = json.contents;
                     doc = this.parseHTML(html);
@@ -107,14 +107,14 @@ class Root extends React.Component {
                 }
             }
             if (manga.publisher == "Yen Press") {
-                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com%2Fseries%2F${slugify(manga.title.en)}`);
+                let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fyenpress.com%2Fseries%2F${slugify(manga.title.en)}`);
                 let json = await response.json();
                 let html = json.contents;
                 let doc = this.parseHTML(html);
                 const volumes = doc.querySelectorAll('#volumes-list div a[href]');
                 if (volumes.length > manga.read.volumes) {
                     const vol = volumes[volumes.length - manga.read.volumes - 1];
-                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com${vol.pathname}`);
+                    let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fyenpress.com${vol.pathname}`);
                     json = await response.text();
                     json = JSON.parse(json);
                     html = json.contents;
@@ -124,11 +124,11 @@ class Root extends React.Component {
                 }
             }
             if (manga.publisher == "Kodansha") {
-                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fseries%2FV2%2F${slugify(manga.title.en)}`);
+                let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fapi.kodansha.us%2Fseries%2FV2%2F${slugify(manga.title.en)}`);
                 let json = await response.json();
                 json = JSON.parse(json.contents);
                 let id = json.response.id;
-                response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fproduct%2FforSeries%2F${id}?platform=web?api-version=1.4`);
+                response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fapi.kodansha.us%2Fproduct%2FforSeries%2F${id}?platform=web?api-version=1.4`);
                 json = await response.json();
                 json = JSON.parse(json.contents);
                 if (json.length > manga.read.volumes) {
@@ -137,7 +137,7 @@ class Root extends React.Component {
                 }
             }
             if (manga.publisher == "Seven Seas") {
-                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fsevenseasentertainment.com%2Fseries%2F${slugify(manga.title.en)}`);
+                let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fsevenseasentertainment.com%2Fseries%2F${slugify(manga.title.en)}`);
                 let json = await response.json();
                 let html = json.contents;
                 let doc = this.parseHTML(html);
