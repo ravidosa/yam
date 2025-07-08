@@ -92,14 +92,23 @@ class Root extends React.Component {
             try {
                 if (manga.publisher == "VIZ Media") {
                     try {
-                        let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com%2Fmanga-books%2Fmanga%2F${slugify(manga.title.en)}%2Fall`);
+                        let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com%2F${slugify(manga.title.en)}`);
                         let json = await response.json();
                         let html = json.contents;
                         let doc = this.parseHTML(html);
-                        const volumes = doc.querySelectorAll('.shelf article div a[href]');
+                        let seeAll = doc.querySelector('[aria-label="see all manga products"]');
+                        if (seeAll) {
+                            let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${seeAll.pathname}`);
+                            json = await response.json();
+                            html = json.contents;
+                            doc = this.parseHTML(html);
+                            console.log(json.contents);
+                        }
+                        const volumes = doc.querySelectorAll('.shelf article div div a[href]');
                         if (volumes.length > manga.read.volumes) {
+                            console.log(volumes);
                             const vol = volumes[manga.read.volumes];
-                            let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${vol.pathname}&disableCache=true`);
+                            let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${vol.pathname}`);
                             json = await response.json();
                             html = json.contents;
                             doc = this.parseHTML(html);
@@ -110,13 +119,20 @@ class Root extends React.Component {
                     }
                     catch(err) {
                         console.log(err);
-                        let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com%2Fmanga-books%2Fmanga%2F${slugify(manga.title.en)}%2Fall`);
+                        let response = await fetch(`https://corsproxy.io/?url=https%3A%2F%2Fwww.viz.com%2F${slugify(manga.title.en)}`);
                         let html = await response.text();
                         let doc = this.parseHTML(html);
-                        const volumes = doc.querySelectorAll('.shelf article div a[href]');
+                        let seeAll = doc.querySelector('[aria-label="see all manga products"]');
+                        if (seeAll) {
+                            let response = await fetch(`https://corsproxy.io/?url=https%3A%2F%2Fwww.viz.com${seeAll.pathname}`);
+                            html = await response.text();
+                            doc = this.parseHTML(html);
+                        }
+                        const volumes = doc.querySelectorAll('.shelf article div div a[href]');
                         if (volumes.length > manga.read.volumes) {
+                            console.log(volumes);
                             const vol = volumes[manga.read.volumes];
-                            let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com${vol.pathname}`);
+                            let response = await fetch(`https://corsproxy.io/?url=https%3A%2F%2Fwww.viz.com${vol.pathname}`);
                             html = await response.text();
                             doc = this.parseHTML(html);
                             let release = doc.querySelector('.o_release-date').innerHTML;
