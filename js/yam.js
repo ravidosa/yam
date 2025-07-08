@@ -89,24 +89,20 @@ class Root extends React.Component {
         let upcoming = [];
         const reading = this.state.series.filter((manga) => manga.tags.includes("reading"))
         for (const manga of reading) {
-            try {
-                if (manga.publisher == "VIZ Media") {
-                    try {
-                        let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com%2F${slugify(manga.title.en)}`);
-                        let json = await response.json();
-                        let html = json.contents;
-                        let doc = this.parseHTML(html);
-                        let seeAll = doc.querySelector('[aria-label="see all manga products"]');
-                        if (seeAll) {
-                            let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${seeAll.pathname}`);
-                            json = await response.json();
-                            html = json.contents;
-                            doc = this.parseHTML(html);
-                            console.log(json.contents);
-                        }
-                        const volumes = doc.querySelectorAll('.shelf article div div a[href]');
+            if (manga.publisher == "VIZ Media") {
+                try {
+                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com%2F${slugify(manga.title.en)}`);
+                    let json = await response.json();
+                    let html = json.contents;
+                    let doc = this.parseHTML(html);
+                    let seeAll = doc.querySelector('[aria-label="see all manga products"]');
+                    if (seeAll) {
+                        let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${seeAll.pathname}`);
+                        json = await response.json();
+                        html = json.contents;
+                        doc = this.parseHTML(html);
+                        const volumes = doc.querySelectorAll('.shelf article div a[href]');
                         if (volumes.length > manga.read.volumes) {
-                            console.log(volumes);
                             const vol = volumes[manga.read.volumes];
                             let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${vol.pathname}`);
                             json = await response.json();
@@ -117,22 +113,45 @@ class Root extends React.Component {
                             upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
                         }
                     }
-                    catch(err) {
-                        console.log(err);
-                        let response = await fetch(`https://corsproxy.io/?url=https%3A%2F%2Fwww.viz.com%2F${slugify(manga.title.en)}`);
-                        let html = await response.text();
-                        let doc = this.parseHTML(html);
-                        let seeAll = doc.querySelector('[aria-label="see all manga products"]');
-                        if (seeAll) {
-                            let response = await fetch(`https://corsproxy.io/?url=https%3A%2F%2Fwww.viz.com${seeAll.pathname}`);
+                    else {
+                        const volumes = [...doc.querySelectorAll('.section_manga a.product-thumb')].sort((a, b) => parseInt(a.pathname.slice(a.pathname.lastIndexOf("/") + 1)) - parseInt(b.pathname.slice(b.pathname.lastIndexOf("/") + 1)));
+                        if (volumes.length > manga.read.volumes) {
+                            const vol = volumes[manga.read.volumes];
+                            let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fwww.viz.com${vol.pathname}`);
+                            json = await response.json();
+                            html = json.contents;
+                            doc = this.parseHTML(html);
+                            let release = doc.querySelector('.o_release-date').innerHTML;
+                            release = release.slice(release.indexOf("</strong>") + 9).trim();
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                        }
+                    }
+                }
+                catch(err) {
+                    let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com%2F${slugify(manga.title.en)}`);
+                    let html = await response.text();
+                    let doc = this.parseHTML(html);
+                    let seeAll = doc.querySelector('[aria-label="see all manga products"]');
+                    if (seeAll) {
+                        let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com${seeAll.pathname}`);
+                        html = await response.text();
+                        doc = this.parseHTML(html);
+                        const volumes = doc.querySelectorAll('.shelf article div a[href]');
+                        if (volumes.length > manga.read.volumes) {
+                            const vol = volumes[manga.read.volumes];
+                            let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com${vol.pathname}`);
                             html = await response.text();
                             doc = this.parseHTML(html);
+                            let release = doc.querySelector('.o_release-date').innerHTML;
+                            release = release.slice(release.indexOf("</strong>") + 9).trim();
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
                         }
-                        const volumes = doc.querySelectorAll('.shelf article div div a[href]');
+                    }
+                    else {
+                        const volumes = [...doc.querySelectorAll('.section_manga a.product-thumb')].sort((a, b) => parseInt(a.pathname.slice(a.pathname.lastIndexOf("/") + 1)) - parseInt(b.pathname.slice(b.pathname.lastIndexOf("/") + 1)));
                         if (volumes.length > manga.read.volumes) {
-                            console.log(volumes);
                             const vol = volumes[manga.read.volumes];
-                            let response = await fetch(`https://corsproxy.io/?url=https%3A%2F%2Fwww.viz.com${vol.pathname}`);
+                            let response = await fetch(`https://corsproxy.io/?https%3A%2F%2Fwww.viz.com${vol.pathname}`);
                             html = await response.text();
                             doc = this.parseHTML(html);
                             let release = doc.querySelector('.o_release-date').innerHTML;
@@ -141,52 +160,49 @@ class Root extends React.Component {
                         }
                     }
                 }
-                if (manga.publisher == "Yen Press") {
-                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com%2Fseries%2F${slugify(manga.title.en)}`);
-                    let json = await response.json();
-                    let html = json.contents;
-                    let doc = this.parseHTML(html);
-                    const volumes = doc.querySelectorAll('#volumes-list div a[href]');
-                    if (volumes.length > manga.read.volumes) {
-                        const vol = volumes[volumes.length - manga.read.volumes - 1];
-                        let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com${vol.pathname}`);
-                        json = await response.text();
-                        json = JSON.parse(json);
-                        html = json.contents;
-                        doc = this.parseHTML(html);
-                        let release = doc.querySelectorAll('.info')[4].innerHTML;
-                        upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
-                    }
-                }
-                if (manga.publisher == "Kodansha") {
-                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fseries%2FV2%2F${slugify(manga.title.en)}`);
-                    let json = await response.json();
-                    json = JSON.parse(json.contents);
-                    let id = json.response.id;
-                    response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fproduct%2FforSeries%2F${id}?platform=web?api-version=1.4`);
-                    json = await response.json();
-                    json = JSON.parse(json.contents);
-                    if (json.length > manga.read.volumes) {
-                        let release = json[manga.read.volumes].publishDate;
-                        upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
-                    }
-                }
-                if (manga.publisher == "Seven Seas") {
-                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fsevenseasentertainment.com%2Fseries%2F${slugify(manga.title.en)}`);
-                    let json = await response.json();
-                    let html = json.contents;
-                    let doc = this.parseHTML(html);
-                    const volumes = doc.querySelectorAll('.volumes-container .series-volume');
-                    if (volumes.length > manga.read.volumes) {
-                        const vol = volumes[manga.read.volumes];
-                        let release = vol.text;
-                        release = release.slice(release.indexOf("Release Date:") + 12, release.indexOf("Price:")).trim();
-                        upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
-                    }
+            }
+            if (manga.publisher == "Yen Press") {
+                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com%2Fseries%2F${slugify(manga.title.en)}`);
+                let json = await response.json();
+                let html = json.contents;
+                let doc = this.parseHTML(html);
+                const volumes = doc.querySelectorAll('#volumes-list div a[href]');
+                if (volumes.length > manga.read.volumes) {
+                    const vol = volumes[volumes.length - manga.read.volumes - 1];
+                    let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fyenpress.com${vol.pathname}`);
+                    json = await response.text();
+                    json = JSON.parse(json);
+                    html = json.contents;
+                    doc = this.parseHTML(html);
+                    let release = doc.querySelectorAll('.info')[4].innerHTML;
+                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
                 }
             }
-            catch {
-                console.log(manga.title);
+            if (manga.publisher == "Kodansha") {
+                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fseries%2FV2%2F${slugify(manga.title.en)}`);
+                let json = await response.json();
+                json = JSON.parse(json.contents);
+                let id = json.response.id;
+                response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fapi.kodansha.us%2Fproduct%2FforSeries%2F${id}?platform=web?api-version=1.4`);
+                json = await response.json();
+                json = JSON.parse(json.contents);
+                if (json.length > manga.read.volumes) {
+                    let release = json[manga.read.volumes].publishDate;
+                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                }
+            }
+            if (manga.publisher == "Seven Seas") {
+                let response = await fetch(`https://api.allorigins.win/get?url=https%3A%2F%2Fsevenseasentertainment.com%2Fseries%2F${slugify(manga.title.en)}`);
+                let json = await response.json();
+                let html = json.contents;
+                let doc = this.parseHTML(html);
+                const volumes = doc.querySelectorAll('.volumes-container .series-volume');
+                if (volumes.length > manga.read.volumes) {
+                    const vol = volumes[manga.read.volumes];
+                    let release = vol.text;
+                    release = release.slice(release.indexOf("Release Date:") + 12, release.indexOf("Price:")).trim();
+                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                }
             }
         }
         console.log(upcoming);
