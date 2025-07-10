@@ -28,9 +28,11 @@ body {
     box-sizing: border-box;
     float: left;
     width: 50%;
-    height: 100%;
+    height: 90%;
     padding-right: 10px;
     border-right: 2px solid var(--color-secondary);
+    overflow-y: scroll;
+    overflow-x: clip;
 }
 
 #list div div h6, #list div h6 {
@@ -67,4 +69,8 @@ input {
 hr {
     display:inline-block;
     width: 100%;
+}
+
+body {
+    overflow: hidden;
 }
