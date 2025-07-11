@@ -9,3 +9,4 @@ utility for tracking the manga i'm reading. fairly lightweight, with data stored
 - refactor tracking for viz titles (why can't everyone be more like kodansha?)
 - add tracking for smaller publishers
 - add tracking for simulpub
+- search function with params
