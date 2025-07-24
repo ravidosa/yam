@@ -35,16 +35,21 @@ body {
     overflow-x: clip;
 }
 
-#list div div h6, #list div h6 {
+#list div div h6, #list div h6, #search div h6 {
     margin: 5px;
+    text-align: left;
 }
 
-#select {
+#select, #search {
     float: right;
     width: 50%;
     height: 100%;
     box-sizing: border-box;
     padding: 10px;
+}
+
+#search {
+    text-align: center;
 }
 
 input {

@@ -1,3 +1,5 @@
+const stopword = ["about","after","all","also","am","an","and","another","any","are","as","at","be","because","been","before","being","between","both","but","by","came","can","come","could","did","do","each","for","from","get","got","has","had","he","have","her","here","him","himself","his","how","if","in","into","is","it","like","make","many","me","might","more","most","much","must","my","never","now","of","on","only","or","other","our","out","over","said","same","see","should","since","some","still","such","take","than","that","the","their","them","then","there","these","they","this","those","through","to","too","under","up","very","was","way","we","well","were","what","where","which","while","who","with","would","you","your","a","i"];
+
 function slugify(text) {
     const slug_exceptions = {
         "Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!": "cherry-magic",
@@ -32,14 +34,16 @@ class Root extends React.Component {
             categories: this.props.data.categories,
             series: this.props.data.series,
             selected: null,
-            upcoming: []
+            upcoming: [],
+            search: []
         };
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
         this.download = this.download.bind(this);
         this.upload = this.upload.bind(this);
+        this.search = this.search.bind(this);
         this.getUpcoming = this.getUpcoming.bind(this);
-        this.getUpcoming();
+        // this.getUpcoming();
     }
     update() {
         const form = document.getElementById("form");
@@ -99,6 +103,12 @@ class Root extends React.Component {
             reader.readAsText(file);
         }
     }
+    search() {
+        let filter = document.getElementById("searchbar").value.toLowerCase().split(' ');
+        let keywords = filter.filter((word) => {return !stopword.includes(word)});
+        let matches = this.state.series.filter((manga) => {return keywords.length > 0 && keywords.every((word) => {return manga.title.en.toLowerCase().includes(word)})});
+        this.setState({search: matches});
+    }
     async getUpcoming() {
         let upcoming = [];
         const reading = this.state.series.filter((manga) => manga.tags.includes("reading"))
@@ -135,11 +145,11 @@ class Root extends React.Component {
                                     doc = this.parseHTML(html);
                                     let release = doc.querySelector('.o_release-date').innerHTML;
                                     release = release.slice(release.indexOf("</strong>") + 9).trim();
-                                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                                 }
                                 else {
                                     if (volumes.length == 0) {
-                                        upcoming.push({title: manga.title.en, volume: null, release: null});
+                                        upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                                     }
                                 }
                             }
@@ -154,11 +164,11 @@ class Root extends React.Component {
                                     doc = this.parseHTML(html);
                                     let release = doc.querySelector('.o_release-date').innerHTML;
                                     release = release.slice(release.indexOf("</strong>") + 9).trim();
-                                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                                 }
                                 else {
                                     if (volumes.length == 0) {
-                                        upcoming.push({title: manga.title.en, volume: null, release: null});
+                                        upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                                     }
                                 }
                             }
@@ -174,11 +184,11 @@ class Root extends React.Component {
                                 doc = this.parseHTML(html);
                                 let release = doc.querySelector('.o_release-date').innerHTML;
                                 release = release.slice(release.indexOf("</strong>") + 9).trim();
-                                upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                                upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                             }
                             else {
                                 if (volumes.length == 0) {
-                                    upcoming.push({title: manga.title.en, volume: null, release: null});
+                                    upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                                 }
                             }
                         }
@@ -207,11 +217,11 @@ class Root extends React.Component {
                                     doc = this.parseHTML(html);
                                     let release = doc.querySelector('.o_release-date').innerHTML;
                                     release = release.slice(release.indexOf("</strong>") + 9).trim();
-                                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                                    upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                                 }
                                 else {
                                     if (volumes.length == 0) {
-                                        upcoming.push({title: manga.title.en, volume: null, release: null});
+                                        upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                                     }
                                 }
                             }
@@ -226,11 +236,11 @@ class Root extends React.Component {
                                 doc = this.parseHTML(html);
                                 let release = doc.querySelector('.o_release-date').innerHTML;
                                 release = release.slice(release.indexOf("</strong>") + 9).trim();
-                                upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                                upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                             }
                             else {
                                 if (volumes.length == 0) {
-                                    upcoming.push({title: manga.title.en, volume: null, release: null});
+                                    upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                                 }
                             }
                         }
@@ -250,11 +260,11 @@ class Root extends React.Component {
                             html = json.contents;
                             doc = this.parseHTML(html);
                             let release = doc.querySelectorAll('.info')[4].innerHTML;
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                         else {
                             if (volumes.length == 0) {
-                                upcoming.push({title: manga.title.en, volume: null, release: null});
+                                upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                             }
                         }
                     }
@@ -269,11 +279,11 @@ class Root extends React.Component {
                             html = await response.text();
                             doc = this.parseHTML(html);
                             let release = doc.querySelectorAll('.info')[4].innerHTML;
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                         else {
                             if (volumes.length == 0) {
-                                upcoming.push({title: manga.title.en, volume: null, release: null});
+                                upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                             }
                         }
                     }
@@ -289,7 +299,7 @@ class Root extends React.Component {
                         json = JSON.parse(json.contents);
                         if (json.length > manga.read.volumes) {
                             let release = json[manga.read.volumes].publishDate;
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                     }
                     catch {
@@ -300,7 +310,7 @@ class Root extends React.Component {
                         json = await response.json();
                         if (json.length > manga.read.volumes) {
                             let release = json[manga.read.volumes].publishDate;
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                     }
                 }
@@ -315,11 +325,11 @@ class Root extends React.Component {
                             const vol = volumes[manga.read.volumes];
                             let release = vol.text;
                             release = release.slice(release.indexOf("Release Date:") + 12, release.indexOf("Price:")).trim();
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                         else {
                             if (volumes.length == 0) {
-                                upcoming.push({title: manga.title.en, volume: null, release: null});
+                                upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                             }
                         }
                     }
@@ -332,11 +342,11 @@ class Root extends React.Component {
                             const vol = volumes[manga.read.volumes];
                             let release = vol.text;
                             release = release.slice(release.indexOf("Release Date:") + 12, release.indexOf("Price:")).trim();
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                         else {
                             if (volumes.length == 0) {
-                                upcoming.push({title: manga.title.en, volume: null, release: null});
+                                upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                             }
                         }
                     }
@@ -356,11 +366,11 @@ class Root extends React.Component {
                             html = json.contents;
                             doc = this.parseHTML(html);
                             let release = doc.querySelector(".mx-1").innerHTML;
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                         else {
                             if (volumes.length == 0) {
-                                upcoming.push({title: manga.title.en, volume: null, release: null});
+                                upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                             }
                         }
                     }
@@ -376,23 +386,23 @@ class Root extends React.Component {
                             html = await response.text();
                             doc = this.parseHTML(html);
                             let release = doc.querySelector(".mx-1").innerHTML;
-                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release))});
+                            upcoming.push({title: manga.title.en, volume: parseInt(manga.read.volumes) + 1, release: new Date(Date.parse(release)), last_read: manga.read.chapters});
                         }
                         else {
                             if (volumes.length == 0) {
-                                upcoming.push({title: manga.title.en, volume: null, release: null});
+                                upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                             }
                         }
                     }
                 }
                 else {
-                    upcoming.push({title: manga.title.en, volume: null, release: null});
+                    upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                 }
                 this.setState({upcoming: upcoming});
             }
             catch(err) {
                 console.log(manga.title, err);
-                upcoming.push({title: manga.title.en, volume: null, release: null});
+                upcoming.push({title: manga.title.en, volume: null, release: null, last_read: manga.read.chapters});
                 this.setState({upcoming: upcoming});
             }
             await sleep(100);
@@ -422,7 +432,7 @@ class Root extends React.Component {
                         <ul>
                             {this.state.upcoming.filter((manga) => manga.release && manga.release > new Date()).sort((a, b) => a.release - b.release).map((manga, index) => {
                                 return (
-                                    <li>{manga.title} {manga.volume} - {manga.release.toLocaleDateString()}</li>
+                                    <li><span title={`left off at #${manga.last_read}`}>{manga.title} {manga.volume} - {manga.release.toLocaleDateString()}</span></li>
                                 )
                             })}
                         </ul>
@@ -432,7 +442,7 @@ class Root extends React.Component {
                         <ul>
                             {this.state.upcoming.filter((manga) => manga.release && manga.release <= new Date()).sort((a, b) => a.release - b.release).map((manga, index) => {
                                 return (
-                                    <li>{manga.title} {manga.volume} - {manga.release.toLocaleDateString()}</li>
+                                    <li><span title={`left off at #${manga.last_read}`}>{manga.title} {manga.volume} - {manga.release.toLocaleDateString()}</span></li>
                                 )
                             })}
                         </ul>
@@ -442,7 +452,7 @@ class Root extends React.Component {
                         <ul>
                             {this.state.upcoming.filter((manga) => manga.release == null).sort((a, b) => a.title.localeCompare(b.title)).map((manga, index) => {
                                 return (
-                                    <li>{manga.title}</li>
+                                    <li><span title={`left off at #${manga.last_read}`}>{manga.title}</span></li>
                                 )
                             })}
                         </ul>
@@ -521,6 +531,16 @@ class Root extends React.Component {
                             <button disabled="" type="button" onClick={this.delete}>Delete</button>
                         }
                     </form>
+                </div>
+                }
+                {this.state.selected == null &&
+                <div id="search">
+                    <input type="text" id="searchbar" onKeyUp={this.search} placeholder="search for manga"></input>
+                    {this.sortAlphabetical(this.state.search).map((manga, index) => {
+                        return (
+                            <div className="series" onClick={() => {this.setState({selected: this.state.series.indexOf(manga)})}}><h6>{manga.title.en}</h6></div>
+                        )
+                    })}
                 </div>
                 }
             </div>
