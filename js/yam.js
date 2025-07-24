@@ -43,7 +43,7 @@ class Root extends React.Component {
         this.upload = this.upload.bind(this);
         this.search = this.search.bind(this);
         this.getUpcoming = this.getUpcoming.bind(this);
-        // this.getUpcoming();
+        this.getUpcoming();
     }
     update() {
         const form = document.getElementById("form");
